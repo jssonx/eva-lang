@@ -199,6 +199,43 @@ Environment interface:
  - Lookup a variable - x
 
 
+Block scope: new environment on block enter
 
+```javascript
+// JavaScript
+let x = 10;
+console.log(x);     // 10
 
+{
+  let x = 20;
+  console.log(x);   // 20
+}
 
+console.log(x);     // 10
+```
+
+```C++
+// C++
+int x = 10;
+cout << x;          // 10
+
+{
+  int x = 20;
+  cout << x;        // 20
+}
+
+cout << x;          // 10
+```
+
+```
+// Eva
+(var x 10)
+(print x)           // 10
+
+(begin
+  (var x 20)
+  (print x)         // 20
+)
+
+(print x)           // 10
+```
