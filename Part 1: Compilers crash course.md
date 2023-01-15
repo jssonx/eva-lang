@@ -137,3 +137,68 @@ count();
 ```
 
 ## Lecture 5: Self-evaluating expressions
+
+BNF，一般用来定义parser，这里我们也用来定义runtime semantics
+
+## Lecture 6
+
+Variable declarition: defines a variable in scope
+
+```javascript
+// JavaScript
+let foo = 10;
+```
+```python
+// Python
+foo = 10
+```
+```
+// Eva
+(var fooo 10)
+```
+
+Assignment expression: assigns a value to a variable
+
+```python
+// Python
+foo = 10
+```
+```javascript
+// JavaScript
+foo = 10;
+```
+```
+// Eva
+(set foo 10)
+```
+
+Variable access: lookup a variable value
+
+```python
+//Python
+foo
+square(2)
+```
+
+```javascript
+// JavaScript
+foo;
+square(2);
+```
+
+```
+// Eva
+foo
+(square 2)
+```
+
+
+Environment interface:
+ - Define a variable - (var x 10)
+ - Assign a new value to a variable - (set x 20)
+ - Lookup a variable - x
+
+
+
+
+
