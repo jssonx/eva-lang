@@ -16,9 +16,17 @@ class Environment {
      */
     define(name, value) {
         this.record[name] = value;
-        console.log(this.record);
         return value;
     }
+    /**
+     * Updates an existing variable.
+     */
+    assign(name, value) {
+        this.resolve(name).record[name] = value;
+        return value;
+    }
+
+
     /**
      * Returns the value of a defined variable, or throws
      * if the variable is not defined.
