@@ -12,6 +12,7 @@ const tests = [
     require('./while-tests'),
     require('./built-in-function-tests'),
     require('./user-defined-function-tests'),
+    require('./lambda-function-tests'),
 ];
 
 
