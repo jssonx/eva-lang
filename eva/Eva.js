@@ -1,5 +1,8 @@
 const Environment = require('./Environment');
 const Transformer = require('./transform/Transformer');
+const evaParser = require('./parser/evaParser');
+
+const fs = require('fs');
 
 
 /**
@@ -18,6 +21,24 @@ class Eva {
     constructor(global = GlobalEnvironment) {
         this.global = global;
         this._transformer = new Transformer();
+    }
+
+    /**
+     * Evaluates global code wrapping into a block.
+     */
+
+    // evalGlobal(expressions) {
+    //     return this._evalBlock(
+    //         ['block', expressions], 
+    //         this.global,
+    //     );
+    // }
+
+    evalGlobal(exp) {
+        return this._evalBody(
+            exp, 
+            this.global,
+        );
     }
 
     /**
@@ -274,6 +295,45 @@ class Eva {
             return instanceEnv.lookup(propName);
         }
 
+        // --------------------------------------------
+        // Super expressions: (super <ClassName>)
+
+        if (exp[0] === 'super') {
+            const [_tag, className] = exp;
+            return this.eval(className, env).parent;
+        }
+
+        // --------------------------------------------
+        // Module declaration: (module <name> <body>)
+
+        if (exp[0] === 'module') {
+            const [_tag, name, body] = exp;
+            const moduleEnv = new Environment({}, env);
+
+            this._evalBody(body, moduleEnv);
+
+            return env.define(name, moduleEnv);
+        }
+
+        // --------------------------------------------
+        // Module import: (import <name>)
+        // (import (export1, export2, ...) <name>)
+        // TODO
+
+        if (exp[0] === 'import') {
+            const [_tag, name] = exp;
+
+            const moduleSrc = fs.readFileSync(
+                `${__dirname}/modules/${name}.eva`,
+                'utf-8',
+            );
+            const body = evaParser.parse(`(begin ${moduleSrc})`);
+            const moduleExp = ['module', name, body];
+
+            // NOTE: If we pass this.global as 2th argument, module will be stored in the global.
+            // return this.eval(moduleExp, this.global);
+            return this.eval(moduleExp, env);
+        }
 
         // --------------------------------------------
         // Function calls:

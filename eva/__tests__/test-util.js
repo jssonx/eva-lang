@@ -7,7 +7,8 @@ function test(eva, code, expected) {
     const exp = evaParser.parse(`(begin ${code})`);
     // console.log(code, exp);
     // console.log("--------------------------------");
-    assert.strictEqual(eva.eval(exp), expected);
+    // assert.strictEqual(eva.eval(exp), expected);
+    assert.strictEqual(eva.evalGlobal(exp), expected);
 }
 
 module.exports = {
