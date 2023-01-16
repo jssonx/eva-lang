@@ -1,4 +1,6 @@
 const Environment = require('./Environment');
+const Transformer = require('./transform/Transformer');
+
 
 /**
  * Eva Interpreter
@@ -15,6 +17,7 @@ class Eva {
 
     constructor(global = GlobalEnvironment) {
         this.global = global;
+        this._transformer = new Transformer();
     }
 
     /**
@@ -134,7 +137,8 @@ class Eva {
             const [_tag, name, params, body] = exp;
 
             //JIT-transpile to a variable declaration
-            const varExp = ['var', name, ['lambda', params, body]];
+            // const varExp = ['var', name, ['lambda', params, body]];
+            const varExp = this._transformer.transformDefToVarLambda(exp);
 
             return this.eval(varExp, env);
             // const fn = {
@@ -144,6 +148,66 @@ class Eva {
             // };
 
             // return env.define(name, fn);
+        }
+
+        // --------------------------------------------
+        // Switch-expression: (switch (cond1, block1) ... )
+        //
+        // Syntactic sugar for nested if-expressions
+
+        if (exp[0] === 'switch') {
+            const ifExp = this._transformer.transformSwitchToIf(exp);
+            return this.eval(ifExp, env);
+        }
+
+        // --------------------------------------------
+        // For-loop: (for init condition modifier body )
+        //
+        // Syntactic sugar for: (begin init (while condition (begin body modifier)))
+
+        if (exp[0] === 'for') {
+            const whileExp = this._transformer.transformForToWhile(exp);
+            return this.eval(whileExp, env);
+        }
+
+        // --------------------------------------------
+        // Increment: (++ foo)
+        //
+        // Syntactic sugar for: (set foo (+ foo 1))
+
+        if (exp[0] === '++') {
+            const setExp = this._transformer.transformIncToSet(exp);
+            return this.eval(setExp, env);
+        }
+
+        // --------------------------------------------
+        // Decrement: (-- foo)
+        //
+        // Syntactic sugar for: (set foo (- foo 1))
+
+        if (exp[0] === '--') {
+            const setExp = this._transformer.transformDeccToSet(exp);
+            return this.eval(setExp, env);
+        }
+
+        // --------------------------------------------
+        // Increment: (+= foo inc)
+        //
+        // Syntactic sugar for: (set foo (+ foo inc))
+
+        if (exp[0] === '+=') {
+            const setExp = this._transformer.transformIncValToSet(exp);
+            return this.eval(setExp, env);
+        }
+
+        // --------------------------------------------
+        // Decrement: (-= foo dec)
+        //
+        // Syntactic sugar for: (set foo (- foo dec))
+
+        if (exp[0] === '-=') {
+            const setExp = this._transformer.transformDecValToSet(exp);
+            return this.eval(setExp, env);
         }
 
         // --------------------------------------------

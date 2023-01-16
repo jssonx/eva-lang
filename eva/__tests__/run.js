@@ -13,6 +13,12 @@ const tests = [
     require('./built-in-function-tests'),
     require('./user-defined-function-tests'),
     require('./lambda-function-tests'),
+    require('./switch-tests'),
+    require('./for-tests'),
+    require('./inc-tests'),
+    require('./dec-tests'),
+    require('./inc-val-tests'),
+    require('./dec-val-tests'),
 ];
 
 
