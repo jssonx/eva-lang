@@ -90,9 +90,21 @@ class Eva {
         // ----------------------------------------------------------------
         // Variable update: (set foo 100)
 
+        // if (exp[0] === 'set') {
+        //     const [_, name, value] = exp;
+        //     return env.assign(name, this.eval(value, env));
+        // }
+
         if (exp[0] === 'set') {
-            const [_, name, value] = exp;
-            return env.assign(name, this.eval(value, env));
+            const [_, ref, value] = exp;
+
+            if (ref[0] === 'prop') {
+                const [_tag, instanceName, propName] = ref;
+                const instanceEnv = this.eval(instanceName, env);
+                return instanceEnv.define(propName, this.eval(value, env));
+            }
+
+            return env.assign(ref, this.eval(value, env));
         }
 
         // ----------------------------------------------------------------
@@ -222,6 +234,47 @@ class Eva {
             };
         }
 
+
+        // --------------------------------------------
+        // Class declaration: (class <Name> <Parent> <Body>)
+
+        if (exp[0] === 'class') {
+            const [_tag, name, parent, body] = exp;
+            const parentEnv = this.eval(parent, env) || env;
+            const classEnv = new Environment({}, parentEnv);
+            this._evalBody(body, classEnv);
+            return env.define(name, classEnv);
+        }
+
+        // --------------------------------------------
+        // Class instantiation: (new <Class> <Arguments>...)
+
+        if (exp[0] === 'new') {
+            const classEnv = this.eval(exp[1], env);
+            const instanceEnv = new Environment({}, classEnv);
+
+            const args = exp
+                .slice(2)
+                .map(arg => this.eval(arg, env));
+            
+            this._callUserDefinedFunction(
+                classEnv.lookup('constructor'),
+                [instanceEnv, ...args],
+            );
+            return instanceEnv;
+        }
+
+        // --------------------------------------------
+        // Property access: (prop <instanceName> <propName>)
+
+        if (exp[0] === 'prop') {
+            const [_tag, instanceName, propName] = exp;
+            const instanceEnv = this.eval(instanceName, env);
+
+            return instanceEnv.lookup(propName);
+        }
+
+
         // --------------------------------------------
         // Function calls:
         //
@@ -242,24 +295,24 @@ class Eva {
             }
 
             // 2. User-defined function:
-
-            const activationRecord = {};
-
-            fn.params.forEach((param, index) => {
-                activationRecord[param] = args[index];
-            });
-
-            const activationEnv = new Environment(
-                activationRecord,
-                fn.env, // static scope!
-                // env, // ? - dynamic scope!
-            );
-
-            return this._evalBody(fn.body, activationEnv);
+            return this._callUserDefinedFunction(fn, args);
         }
 
         // throw `Unimplemented`;
         throw `Unimplemented: ${JSON.stringify(exp)}`;
+    }
+
+    _callUserDefinedFunction(fn, args) {
+        const activationRecord = {};
+        fn.params.forEach((param, index) => {
+            activationRecord[param] = args[index];
+        });
+        const activationEnv = new Environment(
+            activationRecord,
+            fn.env, // static scope!
+            // env, // ? - dynamic scope!
+        );
+        return this._evalBody(fn.body, activationEnv);
     }
 
     _evalBody(body, env) {

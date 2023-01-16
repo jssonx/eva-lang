@@ -19,6 +19,7 @@ const tests = [
     require('./dec-tests'),
     require('./inc-val-tests'),
     require('./dec-val-tests'),
+    require('./class-tests'),
 ];
 
 

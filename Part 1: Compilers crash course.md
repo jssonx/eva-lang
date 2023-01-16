@@ -240,3 +240,7 @@ cout << x;          // 10
 (print x)           // 10
 ```
 
+Implementation: Class
+
+a named environment which can be instantiated and create objects
+
