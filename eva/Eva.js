@@ -318,7 +318,7 @@ class Eva {
         // --------------------------------------------
         // Module import: (import <name>)
         // (import (export1, export2, ...) <name>)
-        // TODO
+        // TODO: import specific functions, export
 
         if (exp[0] === 'import') {
             const [_tag, name] = exp;
