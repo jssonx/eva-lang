@@ -22,8 +22,8 @@ const tests = [
     require('./class-tests'),
     require('./module-tests'),
     require('./import-tests'),
+    require('./env-tests'),
 ];
-
 
 const eva = new Eva();
 
@@ -37,7 +37,5 @@ const eva = new Eva();
 // }));
 
 tests.forEach(test => test(eva));
-
-// eva.eval(['print', '"Hello"', '"World!"']);
 
 console.log('All assertions passed');

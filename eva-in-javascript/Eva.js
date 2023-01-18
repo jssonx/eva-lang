@@ -1,35 +1,27 @@
+const fs = require('fs');
 const Environment = require('./Environment');
 const Transformer = require('./transform/Transformer');
 const evaParser = require('./parser/evaParser');
-const fs = require('fs');
 
-/**
- * Eva Interpreter
- */
+// Eva Interpreter
 class Eva {
 
-    /**
-     * Creates an Eva instance with the global environment
-     */
+    // Creates an Eva instance with the global environment
     constructor(global = GlobalEnvironment) {
         this.global = global;
         this._transformer = new Transformer();
     }
 
-    /**
-     * Evaluates global code wrapping into a block.
-     */
+    // Evaluates global code wrapping into a block.
     evalGlobal(exp) {
-        return this._evalBody(
-            exp, 
-            this.global,
-        );
+        return this._evalBody(exp, this.global);
     }
 
-    /**
-     * Evaluates an expression in the given environment.
-     */
+    // Evaluates an expression in the given environment.
     eval(exp, env = this.global) {
+        
+        // this._logEnvChain(env);
+        
         // Self-evaluating expressions:
         if (this._isNumber(exp)) {
             return exp;
@@ -214,6 +206,20 @@ class Eva {
 
         // throw `Unimplemented`;
         throw `Unimplemented: ${JSON.stringify(exp)}`;
+    }
+
+    _logEnvChain(env) {
+        let env_output = env;
+        let res = [];
+        while (env_output.parent != null) {
+            res.push(env_output.record);
+            res.push('->');
+            env_output = env_output.parent;
+        }
+        if(res.length > 0){
+            res.pop();
+        }
+        console.log(res);
     }
 
     _callUserDefinedFunction(fn, args) {
