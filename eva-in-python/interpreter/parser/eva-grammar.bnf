@@ -1,0 +1,66 @@
+/** 
+ *
+ * S- expression parser.
+ * Atom: 42, foo, bar, "Hello World"
+ *
+ * List: (), (+ 5 x), (print "hello")
+ *
+ *
+ * Some notes: 
+ * Syntax is JS centric. While generating a .py file does
+ * indeed give you a valid python program, it doesn't translate
+ * everything perfectly/automatically. "skip whitespace" below
+ * is supposed to be a comment. It puts that string into the file
+ * directly, which is not a valid Python comment. 
+ * Additionally, it does not properly escape the regexes or treat
+ * them as raw strings (r"regex"), a minor bug that needs manual
+ * editing of the generated parser afterward. Finally, the below 
+ * notation for Number is actually wrong for Python, since Python
+ * has different types for float() vs int(). 
+ *
+ */
+
+//-----------------------------------
+// Lexical grammar (tokens):
+%lex
+
+%%
+
+\s+ 		return
+
+\"[^\"]*\"	return 'STRING'
+
+\d+\.\d+	return 'FLOAT'
+
+\d+		return 'INT'
+
+[\w\-+*=<>/\']+ 	return 'SYMBOL'
+/lex
+
+
+//-----------------------------------
+// Syntactic grammar (BNF):
+
+%%
+
+Exp
+	: Atom
+	| List
+	;
+
+Atom
+	: INT { $$ = int($1) }
+	| FLOAT { $$ = float($1) }
+	| STRING
+	| SYMBOL
+	;
+
+List
+	: '(' ListEntries ')' { $$ = $2 }
+	;
+
+ListEntries
+	: ListEntries Exp { $1.append($2); $$ = $1 }
+	| /* empty */ { $$ = [] }
+	;
+

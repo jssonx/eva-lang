@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+import sys
+
+from interpreter.eva import eva
+from interpreter.parser import evaParser
+
+eva = eva.Eva()
+
+def evalGlobal(src):
+    exp = evaParser.parse(f'(begin {src})')
+    return eva.evalGlobal(exp)
+
+def main():
+    if len(sys.argv) >= 3:
+        _path, mode, exp = sys.argv
+    else:
+        print("Argument set unrecognized.")
+        return 
+
+    if (mode == '-e'):
+        return evalGlobal(exp)
+
+    if (mode == '-f'):
+        with open(exp, 'r') as file:
+            src = file.read()
+            return evalGlobal(src)
+            
+main()
