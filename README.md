@@ -4,6 +4,9 @@
 
 Eva is a modern functional programming language designed to offer an intuitive and powerful approach to software development. It seamlessly integrates core concepts of functional programming with the versatility of object-oriented paradigms.
 
+![eva](./img/eva.png)
+*Figure 1: Interpreter Workflow Diagram - Depicting the lexing, parsing, and interpretation phases, this figure outlines the transformation from source code to executable output in the Eva language interpreter.*
+
 ## Features
 
 - **Basic Expressions & Variables:** Eva handles basic expressions and variables with a focus on scopes and lexical environments. It features robust control structures and employs a parser generator for syntax analysis.
@@ -17,7 +20,7 @@ Eva is a modern functional programming language designed to offer an intuitive a
 To run Eva programs, use the following command:
 
 ```bash
-$ ./bin/eva -f ./path/to/yourfile.eva
+$ ./bin/eva -f ./test.eva
 ```
 
 ## Testing
